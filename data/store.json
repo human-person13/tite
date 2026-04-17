@@ -1,0 +1,800 @@
+{
+  "players": [
+    {
+      "id": "player-1",
+      "email": "player@studyquest.com",
+      "name": "Player One",
+      "passwordHash": "1c13d4c01f0ad5037ec146043d0c710e523058d4e831219de10611d3c4200467",
+      "salt": "studyquest-demo-salt",
+      "rank": "Knight Rank",
+      "level": 12,
+      "xp": 3474,
+      "xpMax": 5000,
+      "stages": 24,
+      "wins": 19,
+      "losses": 6,
+      "coins": 1275,
+      "avatarUrl": "/data/uploads/player-1.jpg"
+    },
+    {
+      "id": "player-189427c9-2734-4dc8-a3bf-441dfce32cc4",
+      "email": "autotest-1775746055759@studyquest.com",
+      "name": "Auto Test",
+      "passwordHash": "02d591ed579d1b54d3b7dafbd64da26a5ce85a9417bab1f659e10b01647788c0",
+      "salt": "09c3748a-a996-4a66-9512-5bb69942d703",
+      "rank": "Novice Rank",
+      "level": 1,
+      "xp": 24,
+      "xpMax": 100,
+      "stages": 1,
+      "wins": 1,
+      "losses": 0,
+      "coins": 222285,
+      "avatarUrl": ""
+    },
+    {
+      "id": "player-dfcaab92-94d3-4b80-8bac-4dfa4d197a1f",
+      "email": "zethsu3@gmail.com",
+      "name": "zethsu",
+      "passwordHash": "c66a4b636f93ce85f5d3937fb6dd3d1677e5ee2845ba237901f3327b7a70b92b",
+      "salt": "b135c50d-8a5d-4b50-a9d9-9904817b702b",
+      "rank": "Novice Rank",
+      "level": 2,
+      "xp": 156,
+      "xpMax": 250,
+      "stages": 5,
+      "wins": 9,
+      "losses": 1,
+      "coins": 435,
+      "avatarUrl": ""
+    }
+  ],
+  "progress": {
+    "player-1": {
+      "islands": [
+        {
+          "id": 1,
+          "name": "Island 1",
+          "status": "unlocked",
+          "cleared": 3,
+          "total": 10,
+          "levels": [
+            {
+              "id": 1,
+              "status": "completed",
+              "stars": 3
+            },
+            {
+              "id": 2,
+              "status": "completed",
+              "stars": 2
+            },
+            {
+              "id": 3,
+              "status": "completed",
+              "stars": 1
+            },
+            {
+              "id": 4,
+              "status": "unlocked",
+              "stars": 0
+            },
+            {
+              "id": 5,
+              "status": "locked",
+              "stars": 0
+            },
+            {
+              "id": 6,
+              "status": "locked",
+              "stars": 0
+            },
+            {
+              "id": 7,
+              "status": "locked",
+              "stars": 0
+            },
+            {
+              "id": 8,
+              "status": "locked",
+              "stars": 0
+            },
+            {
+              "id": 9,
+              "status": "locked",
+              "stars": 0
+            },
+            {
+              "id": 10,
+              "status": "locked",
+              "stars": 0
+            }
+          ]
+        },
+        {
+          "id": 2,
+          "name": "Island 2",
+          "status": "unlocked",
+          "cleared": 3,
+          "total": 10,
+          "levels": [
+            {
+              "id": 1,
+              "status": "completed",
+              "stars": 2
+            },
+            {
+              "id": 2,
+              "status": "completed",
+              "stars": 1
+            },
+            {
+              "id": 3,
+              "status": "completed",
+              "stars": 3
+            },
+            {
+              "id": 4,
+              "status": "unlocked",
+              "stars": 0
+            },
+            {
+              "id": 5,
+              "status": "locked",
+              "stars": 0
+            },
+            {
+              "id": 6,
+              "status": "locked",
+              "stars": 0
+            },
+            {
+              "id": 7,
+              "status": "locked",
+              "stars": 0
+            },
+            {
+              "id": 8,
+              "status": "locked",
+              "stars": 0
+            },
+            {
+              "id": 9,
+              "status": "locked",
+              "stars": 0
+            },
+            {
+              "id": 10,
+              "status": "locked",
+              "stars": 0
+            }
+          ]
+        },
+        {
+          "id": 3,
+          "name": "Island 3",
+          "status": "locked",
+          "cleared": 0,
+          "total": 10,
+          "levels": [
+            {
+              "id": 1,
+              "status": "locked",
+              "stars": 0
+            },
+            {
+              "id": 2,
+              "status": "locked",
+              "stars": 0
+            },
+            {
+              "id": 3,
+              "status": "locked",
+              "stars": 0
+            },
+            {
+              "id": 4,
+              "status": "locked",
+              "stars": 0
+            },
+            {
+              "id": 5,
+              "status": "locked",
+              "stars": 0
+            },
+            {
+              "id": 6,
+              "status": "locked",
+              "stars": 0
+            },
+            {
+              "id": 7,
+              "status": "locked",
+              "stars": 0
+            },
+            {
+              "id": 8,
+              "status": "locked",
+              "stars": 0
+            },
+            {
+              "id": 9,
+              "status": "locked",
+              "stars": 0
+            },
+            {
+              "id": 10,
+              "status": "locked",
+              "stars": 0
+            }
+          ]
+        },
+        {
+          "id": 4,
+          "name": "Island 4",
+          "status": "locked",
+          "cleared": 0,
+          "total": 10,
+          "levels": [
+            {
+              "id": 1,
+              "status": "locked",
+              "stars": 0
+            },
+            {
+              "id": 2,
+              "status": "locked",
+              "stars": 0
+            },
+            {
+              "id": 3,
+              "status": "locked",
+              "stars": 0
+            },
+            {
+              "id": 4,
+              "status": "locked",
+              "stars": 0
+            },
+            {
+              "id": 5,
+              "status": "locked",
+              "stars": 0
+            },
+            {
+              "id": 6,
+              "status": "locked",
+              "stars": 0
+            },
+            {
+              "id": 7,
+              "status": "locked",
+              "stars": 0
+            },
+            {
+              "id": 8,
+              "status": "locked",
+              "stars": 0
+            },
+            {
+              "id": 9,
+              "status": "locked",
+              "stars": 0
+            },
+            {
+              "id": 10,
+              "status": "locked",
+              "stars": 0
+            }
+          ]
+        }
+      ]
+    },
+    "player-189427c9-2734-4dc8-a3bf-441dfce32cc4": {
+      "islands": [
+        {
+          "id": 1,
+          "name": "Island 1",
+          "status": "unlocked",
+          "cleared": 1,
+          "total": 10,
+          "levels": [
+            {
+              "id": 1,
+              "status": "completed",
+              "stars": 3
+            },
+            {
+              "id": 2,
+              "status": "unlocked",
+              "stars": 0
+            },
+            {
+              "id": 3,
+              "status": "locked",
+              "stars": 0
+            },
+            {
+              "id": 4,
+              "status": "locked",
+              "stars": 0
+            },
+            {
+              "id": 5,
+              "status": "locked",
+              "stars": 0
+            },
+            {
+              "id": 6,
+              "status": "locked",
+              "stars": 0
+            },
+            {
+              "id": 7,
+              "status": "locked",
+              "stars": 0
+            },
+            {
+              "id": 8,
+              "status": "locked",
+              "stars": 0
+            },
+            {
+              "id": 9,
+              "status": "locked",
+              "stars": 0
+            },
+            {
+              "id": 10,
+              "status": "locked",
+              "stars": 0
+            }
+          ]
+        },
+        {
+          "id": 2,
+          "name": "Island 2",
+          "status": "locked",
+          "cleared": 0,
+          "total": 10,
+          "levels": [
+            {
+              "id": 1,
+              "status": "locked",
+              "stars": 0
+            },
+            {
+              "id": 2,
+              "status": "locked",
+              "stars": 0
+            },
+            {
+              "id": 3,
+              "status": "locked",
+              "stars": 0
+            },
+            {
+              "id": 4,
+              "status": "locked",
+              "stars": 0
+            },
+            {
+              "id": 5,
+              "status": "locked",
+              "stars": 0
+            },
+            {
+              "id": 6,
+              "status": "locked",
+              "stars": 0
+            },
+            {
+              "id": 7,
+              "status": "locked",
+              "stars": 0
+            },
+            {
+              "id": 8,
+              "status": "locked",
+              "stars": 0
+            },
+            {
+              "id": 9,
+              "status": "locked",
+              "stars": 0
+            },
+            {
+              "id": 10,
+              "status": "locked",
+              "stars": 0
+            }
+          ]
+        },
+        {
+          "id": 3,
+          "name": "Island 3",
+          "status": "locked",
+          "cleared": 0,
+          "total": 10,
+          "levels": [
+            {
+              "id": 1,
+              "status": "locked",
+              "stars": 0
+            },
+            {
+              "id": 2,
+              "status": "locked",
+              "stars": 0
+            },
+            {
+              "id": 3,
+              "status": "locked",
+              "stars": 0
+            },
+            {
+              "id": 4,
+              "status": "locked",
+              "stars": 0
+            },
+            {
+              "id": 5,
+              "status": "locked",
+              "stars": 0
+            },
+            {
+              "id": 6,
+              "status": "locked",
+              "stars": 0
+            },
+            {
+              "id": 7,
+              "status": "locked",
+              "stars": 0
+            },
+            {
+              "id": 8,
+              "status": "locked",
+              "stars": 0
+            },
+            {
+              "id": 9,
+              "status": "locked",
+              "stars": 0
+            },
+            {
+              "id": 10,
+              "status": "locked",
+              "stars": 0
+            }
+          ]
+        },
+        {
+          "id": 4,
+          "name": "Island 4",
+          "status": "locked",
+          "cleared": 0,
+          "total": 10,
+          "levels": [
+            {
+              "id": 1,
+              "status": "locked",
+              "stars": 0
+            },
+            {
+              "id": 2,
+              "status": "locked",
+              "stars": 0
+            },
+            {
+              "id": 3,
+              "status": "locked",
+              "stars": 0
+            },
+            {
+              "id": 4,
+              "status": "locked",
+              "stars": 0
+            },
+            {
+              "id": 5,
+              "status": "locked",
+              "stars": 0
+            },
+            {
+              "id": 6,
+              "status": "locked",
+              "stars": 0
+            },
+            {
+              "id": 7,
+              "status": "locked",
+              "stars": 0
+            },
+            {
+              "id": 8,
+              "status": "locked",
+              "stars": 0
+            },
+            {
+              "id": 9,
+              "status": "locked",
+              "stars": 0
+            },
+            {
+              "id": 10,
+              "status": "locked",
+              "stars": 0
+            }
+          ]
+        }
+      ]
+    },
+    "player-dfcaab92-94d3-4b80-8bac-4dfa4d197a1f": {
+      "islands": [
+        {
+          "id": 1,
+          "name": "Island 1",
+          "status": "unlocked",
+          "cleared": 5,
+          "total": 10,
+          "levels": [
+            {
+              "id": 1,
+              "status": "completed",
+              "stars": 3
+            },
+            {
+              "id": 2,
+              "status": "completed",
+              "stars": 3
+            },
+            {
+              "id": 3,
+              "status": "completed",
+              "stars": 3
+            },
+            {
+              "id": 4,
+              "status": "completed",
+              "stars": 3
+            },
+            {
+              "id": 5,
+              "status": "completed",
+              "stars": 3
+            },
+            {
+              "id": 6,
+              "status": "unlocked",
+              "stars": 0
+            },
+            {
+              "id": 7,
+              "status": "locked",
+              "stars": 0
+            },
+            {
+              "id": 8,
+              "status": "locked",
+              "stars": 0
+            },
+            {
+              "id": 9,
+              "status": "locked",
+              "stars": 0
+            },
+            {
+              "id": 10,
+              "status": "locked",
+              "stars": 0
+            }
+          ]
+        },
+        {
+          "id": 2,
+          "name": "Island 2",
+          "status": "locked",
+          "cleared": 0,
+          "total": 10,
+          "levels": [
+            {
+              "id": 1,
+              "status": "locked",
+              "stars": 0
+            },
+            {
+              "id": 2,
+              "status": "locked",
+              "stars": 0
+            },
+            {
+              "id": 3,
+              "status": "locked",
+              "stars": 0
+            },
+            {
+              "id": 4,
+              "status": "locked",
+              "stars": 0
+            },
+            {
+              "id": 5,
+              "status": "locked",
+              "stars": 0
+            },
+            {
+              "id": 6,
+              "status": "locked",
+              "stars": 0
+            },
+            {
+              "id": 7,
+              "status": "locked",
+              "stars": 0
+            },
+            {
+              "id": 8,
+              "status": "locked",
+              "stars": 0
+            },
+            {
+              "id": 9,
+              "status": "locked",
+              "stars": 0
+            },
+            {
+              "id": 10,
+              "status": "locked",
+              "stars": 0
+            }
+          ]
+        },
+        {
+          "id": 3,
+          "name": "Island 3",
+          "status": "locked",
+          "cleared": 0,
+          "total": 10,
+          "levels": [
+            {
+              "id": 1,
+              "status": "locked",
+              "stars": 0
+            },
+            {
+              "id": 2,
+              "status": "locked",
+              "stars": 0
+            },
+            {
+              "id": 3,
+              "status": "locked",
+              "stars": 0
+            },
+            {
+              "id": 4,
+              "status": "locked",
+              "stars": 0
+            },
+            {
+              "id": 5,
+              "status": "locked",
+              "stars": 0
+            },
+            {
+              "id": 6,
+              "status": "locked",
+              "stars": 0
+            },
+            {
+              "id": 7,
+              "status": "locked",
+              "stars": 0
+            },
+            {
+              "id": 8,
+              "status": "locked",
+              "stars": 0
+            },
+            {
+              "id": 9,
+              "status": "locked",
+              "stars": 0
+            },
+            {
+              "id": 10,
+              "status": "locked",
+              "stars": 0
+            }
+          ]
+        },
+        {
+          "id": 4,
+          "name": "Island 4",
+          "status": "locked",
+          "cleared": 0,
+          "total": 10,
+          "levels": [
+            {
+              "id": 1,
+              "status": "locked",
+              "stars": 0
+            },
+            {
+              "id": 2,
+              "status": "locked",
+              "stars": 0
+            },
+            {
+              "id": 3,
+              "status": "locked",
+              "stars": 0
+            },
+            {
+              "id": 4,
+              "status": "locked",
+              "stars": 0
+            },
+            {
+              "id": 5,
+              "status": "locked",
+              "stars": 0
+            },
+            {
+              "id": 6,
+              "status": "locked",
+              "stars": 0
+            },
+            {
+              "id": 7,
+              "status": "locked",
+              "stars": 0
+            },
+            {
+              "id": 8,
+              "status": "locked",
+              "stars": 0
+            },
+            {
+              "id": 9,
+              "status": "locked",
+              "stars": 0
+            },
+            {
+              "id": 10,
+              "status": "locked",
+              "stars": 0
+            }
+          ]
+        }
+      ]
+    }
+  },
+  "shopItems": [
+    {
+      "id": "shield_skin",
+      "name": "Knight Shield",
+      "price": 180,
+      "emoji": "🛡"
+    },
+    {
+      "id": "sword_skin",
+      "name": "Hero Sword",
+      "price": 220,
+      "emoji": "⚔"
+    },
+    {
+      "id": "hint_pack",
+      "name": "Hint Pack",
+      "price": 90,
+      "emoji": "💡"
+    },
+    {
+      "id": "xp_boost",
+      "name": "XP Boost",
+      "price": 150,
+      "emoji": "✨"
+    }
+  ]
+}
