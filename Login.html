@@ -1,0 +1,83 @@
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="materialize/css/materialize.min.css">
+    <link rel="stylesheet" href="lahat.css">
+    <title>Login</title>
+</head>
+<body>
+
+    <div class="auth-wrapper">
+        <div class="auth-card">
+
+            <!-- select kung login or sign up -->
+            <div id="view-default">
+                <h5 class="center-align auth-title">Welcome Adventurer ⚜️⚔️</h5>
+                <button class="btn green darken-2 waves-effect waves-light full-width" onclick="showForm('login')">Login</button>
+                <button class="btn white green-text darken-2 waves-effect waves-light full-width outlined" onclick="showForm('signup')">Sign Up</button>
+            </div>
+
+            <!-- Login Form -->
+            <div id="view-login" style="display:none;">
+                <button class="back-btn" onclick="goBack()">&#8592; Back</button>
+                <h5 class="center-align auth-title">Login</h5>
+                <p class="center-align" id="login-status"></p>
+                <div class="input-field">
+                    <input id="login-email" type="email" />
+                    <label for="login-email">Gmail</label>
+                </div>
+                <div class="input-field">
+                    <input id="login-password" type="password" />
+                    <label for="login-password">Password</label>
+                </div>
+                <button class="btn green darken-2 waves-effect waves-light full-width" id="login-submit"
+                    type="button">Login</button>
+            </div>
+
+            <!-- Sign Up Form -->
+            <div id="view-signup" style="display:none;">
+                <button class="back-btn" onclick="goBack()">&#8592; Back</button>
+                <h5 class="center-align auth-title">Sign Up</h5>
+                <p class="center-align" id="signup-status"></p>
+                <div class="input-field">
+                    <input id="signup-username" type="text" />
+                    <label for="signup-username">Username</label>
+                </div>
+                <div class="input-field">
+                    <input id="signup-email" type="email" />
+                    <label for="signup-email">Gmail</label>
+                </div>
+                <div class="input-field">
+                    <input id="signup-password" type="password" />
+                    <label for="signup-password">Password</label>
+                </div>
+                <div class="input-field">
+                    <input id="signup-confirm" type="password" />
+                    <label for="signup-confirm">Re-enter Password</label>
+                </div>
+                <button class="btn green darken-2 waves-effect waves-light full-width" id="signup-submit"
+                    type="button">Sign Up</button>
+            </div>
+
+        </div>
+    </div>
+
+    <script src="materialize/js/materialize.min.js"></script>
+    <script>
+        function showForm(type) {
+            document.getElementById('view-default').style.display = 'none';
+            document.getElementById('view-login').style.display   = type === 'login'  ? 'block' : 'none';
+            document.getElementById('view-signup').style.display  = type === 'signup' ? 'block' : 'none';
+        }
+
+        function goBack() {
+            document.getElementById('view-default').style.display = 'block';
+            document.getElementById('view-login').style.display   = 'none';
+            document.getElementById('view-signup').style.display  = 'none';
+        }
+    </script>
+    <script type="module" src="main.js"></script>
+    <script type="module" src="scripts/login-app.js"></script>
+</body>
+</html>

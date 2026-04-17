@@ -1,0 +1,655 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="lahat.css">
+    <link rel="stylesheet" href="battle.css">
+    <link
+        href="https://fonts.googleapis.com/css2?family=MedievalSharp&family=Cinzel:wght@400;600;700&family=Crimson+Text:ital,wght@0,400;0,600;1,400&display=swap"
+        rel="stylesheet">
+    <title>StudyQuest Battle</title>
+</head>
+
+<body class="battle-body">
+    <div class="battle-page">
+        <header class="battle-topbar">
+            <div>
+                <div class="battle-topbar-title">StudyQuest Battle</div>
+                <div class="battle-subtitle" id="battle-subtitle">Island 1 | Stage 1</div>
+            </div>
+            <button class="battle-retreat-btn" type="button" onclick="returnToMap()">Return to Map</button>
+        </header>
+
+        <main class="battle-layout">
+            <section class="battle-enemy-area">
+                <div class="battle-stage-chip" id="battle-stage-chip">Island 1 - Stage 1</div>
+
+                <div class="battle-fighters-row" id="battle-fighters-row">
+                    <div class="battle-phaser-host" id="battle-phaser" aria-label="Battle arena"></div>
+                    <div class="fighter-card player-card">
+                        <div class="hp-bar-container">
+                            <div class="hp-bar-label">Player HP</div>
+                            <div class="hp-bar-bg">
+                                <div class="hp-bar-fill player-hp-fill" id="player-hp-fill"></div>
+                            </div>
+                            <div class="hp-text" id="player-hp-text">100 / 100</div>
+                        </div>
+
+                        <div class="player-sprite-box" id="player-sprite">
+                            <div class="fighter-sprite player-graphic" id="player-graphic"
+                                aria-label="Player character"></div>
+                        </div>
+                        <div class="player-name" id="player-name">Code Knight</div>
+                    </div>
+
+                    <div class="fighter-card enemy-card">
+                        <div class="hp-bar-container">
+                            <div class="hp-bar-label">Enemy HP</div>
+                            <div class="hp-bar-bg">
+                                <div class="hp-bar-fill enemy-hp-fill" id="enemy-hp-fill"></div>
+                            </div>
+                            <div class="hp-text" id="enemy-hp-text">100 / 100</div>
+                        </div>
+
+                        <div class="enemy-sprite-box" id="enemy-sprite">
+                            <div class="fighter-sprite enemy-graphic" id="enemy-graphic" aria-label="Enemy character">
+                            </div>
+                        </div>
+                        <div class="enemy-name" id="enemy-name">Debug Drake</div>
+                    </div>
+                </div>
+            </section>
+
+            <section class="battle-arena" id="battle-arena">
+                <div class="battle-feedback" id="battle-feedback">Prepare for battle.</div>
+            </section>
+
+            <section class="battle-player-area">
+                <div class="coding-quiz-box">
+                    <div class="quiz-question" id="quiz-question">Question loading...</div>
+                    <div class="panel-copy" id="quiz-type-copy">Battle prompt</div>
+                    <div class="quiz-hint" id="quiz-hint">Answer to attack.</div>
+                    <pre class="quiz-code-snippet" id="quiz-code-snippet"></pre>
+                    <div class="quiz-answers" id="quiz-answers"></div>
+                </div>
+            </section>
+        </main>
+    </div>
+
+    <div class="battle-result-overlay" id="battle-result-overlay">
+        <div class="battle-result-modal">
+            <h2 class="result-title" id="result-title">Victory</h2>
+            <p class="result-msg" id="result-msg">Enemy defeated.</p>
+            <div class="result-rewards" id="result-rewards">
+                <span id="reward-coins">+0 coins</span>
+                <span id="reward-xp">+0 XP</span>
+            </div>
+            <div class="battle-result-actions" id="battle-result-actions"></div>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/ace-builds@1.32.6/src-min-noconflict/ace.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/ace-builds@1.32.6/src-min-noconflict/mode-python.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/ace-builds@1.32.6/src-min-noconflict/theme-gob.js"></script>
+    <script src="battle-config.js"></script>
+    <script>
+        const urlParams = new URLSearchParams(window.location.search);
+        const islandId = Number.parseInt(urlParams.get('island') || '1', 10);
+        const stageId = Number.parseInt(urlParams.get('stage') || '1', 10);
+
+        const battleData = window.BATTLE_DATA || { islands: {}, createDefaultConfig: () => ({ stages: {} }) };
+        const fightTypeConfig = battleData.fightTypes || {
+            normal: { label: 'Normal Fight', enemyHP: 100 },
+            boss: { label: 'Boss Fight', enemyHP: 150 }
+        };
+        const islandConfig = battleData.islands[islandId] || battleData.createDefaultConfig(islandId, stageId);
+        const stageConfig = islandConfig.stages?.[stageId] || islandConfig.stages?.[String(stageId)] || {
+            name: `Stage ${stageId}`,
+            enemyKey: 'enemy1',
+            fightType: 'normal',
+            questions: []
+        };
+        const selectedEnemy = islandConfig.enemies?.[stageConfig.enemyKey] || {
+            name: 'Enemy',
+            hp: fightTypeConfig[stageConfig.fightType || 'normal']?.enemyHP || 100
+        };
+        const battleConfig = {
+            islandName: islandConfig.name,
+            enemyName: selectedEnemy.name,
+            enemyHP: stageConfig.enemyHP || selectedEnemy.hp || fightTypeConfig[stageConfig.fightType || 'normal']?.enemyHP || 100,
+            stageName: stageConfig.name,
+            fightType: stageConfig.fightType || 'normal',
+            questions: stageConfig.questions,
+            rewards: {
+                coins: 30 + (stageId * 5),
+                xp: 20 + (stageId * 4)
+            }
+        };
+        window.battleConfig = battleConfig;
+        const battleState = {
+            maxPlayerHP: 100,
+            playerHP: 100,
+            maxEnemyHP: battleConfig.enemyHP,
+            enemyHP: battleConfig.enemyHP,
+            questionIndex: 0,
+            questions: [],
+            locked: false,
+            finished: false,
+            editor: null,
+            spriteTimers: {}
+        };
+        window.battleState = battleState;
+
+        const playerSprites = {
+            idle: { src: 'assets/character/Idle.png', columns: 4, rows: 1, frames: [0, 1, 2, 3], fps: 8, loop: true },
+            walk: { src: 'assets/character/Idle.png', columns: 4, rows: 1, frames: [0, 1, 2, 3], fps: 10, loop: true },
+            attack: { src: 'assets/character/Attack  1.png', columns: 5, rows: 1, frames: [0, 1, 2, 3, 4], fps: 12, loop: false },
+            hurt: { src: 'assets/character/Hurt.png', columns: 2, rows: 1, frames: [0, 1], fps: 10, loop: false }
+        };
+        window.playerSprites = playerSprites;
+
+        const defaultEnemySprites = {
+            idle: { src: 'assets/enemies/skeleton_Idle.png', columns: 7, rows: 1, frames: [0, 1, 2, 3, 4, 5, 6], fps: 8, loop: true },
+            walk: { src: 'assets/enemies/skeleton_Idle.png', columns: 7, rows: 1, frames: [0, 1, 2, 3, 4, 5, 6], fps: 10, loop: true },
+            attack: { src: 'assets/enemies/skeleton_Attack_1.png', columns: 5, rows: 1, frames: [0, 1, 2, 3, 4], fps: 12, loop: false },
+            hurt: { src: 'assets/enemies/skeleton_Hurt.png', columns: 2, rows: 1, frames: [0, 1], fps: 10, loop: false },
+            dead: { src: 'assets/enemies/skeleton_Dead.png', columns: 4, rows: 1, frames: [0, 1, 2, 3], fps: 8, loop: false }
+        };
+        window.defaultEnemySprites = defaultEnemySprites;
+
+        const els = {
+            subtitle: document.getElementById('battle-subtitle'),
+            stageChip: document.getElementById('battle-stage-chip'),
+            enemyName: document.getElementById('enemy-name'),
+            enemyGraphic: document.getElementById('enemy-graphic'),
+            playerGraphic: document.getElementById('player-graphic'),
+            enemyFill: document.getElementById('enemy-hp-fill'),
+            enemyText: document.getElementById('enemy-hp-text'),
+            playerFill: document.getElementById('player-hp-fill'),
+            playerText: document.getElementById('player-hp-text'),
+            playerSprite: document.getElementById('player-sprite'),
+            enemySprite: document.getElementById('enemy-sprite'),
+            arena: document.getElementById('battle-arena'),
+            feedback: document.getElementById('battle-feedback'),
+            question: document.getElementById('quiz-question'),
+            typeCopy: document.getElementById('quiz-type-copy'),
+            snippet: document.getElementById('quiz-code-snippet'),
+            hint: document.getElementById('quiz-hint'),
+            answers: document.getElementById('quiz-answers'),
+            overlay: document.getElementById('battle-result-overlay'),
+            resultTitle: document.getElementById('result-title'),
+            resultMsg: document.getElementById('result-msg'),
+            rewardCoins: document.getElementById('reward-coins'),
+            rewardXp: document.getElementById('reward-xp'),
+            resultActions: document.getElementById('battle-result-actions')
+        };
+
+        function initBattle() {
+            battleState.questions = shuffleQuestions(battleConfig.questions);
+            els.subtitle.textContent = `${battleConfig.islandName} | ${battleConfig.stageName}`;
+            els.stageChip.textContent = `${formatFightType(battleConfig.fightType)} | ${battleConfig.islandName} - ${battleConfig.stageName}`;
+            els.stageChip.dataset.fightType = battleConfig.fightType;
+            els.enemyName.textContent = battleConfig.enemyName;
+            playSpriteState('player', 'idle');
+            playSpriteState('enemy', 'idle');
+            updateHPBars();
+            renderQuestion();
+        }
+
+        function formatFightType(fightType) {
+            return fightTypeConfig[fightType]?.label || fightTypeConfig.normal.label;
+        }
+
+        function updateHPBars() {
+            const enemyPercent = Math.max(0, (battleState.enemyHP / battleState.maxEnemyHP) * 100);
+            const playerPercent = Math.max(0, (battleState.playerHP / battleState.maxPlayerHP) * 100);
+            els.enemyFill.style.width = `${enemyPercent}%`;
+            els.playerFill.style.width = `${playerPercent}%`;
+            els.enemyText.textContent = `${battleState.enemyHP} / ${battleState.maxEnemyHP}`;
+            els.playerText.textContent = `${battleState.playerHP} / ${battleState.maxPlayerHP}`;
+        }
+
+        function getCurrentQuestion() {
+            return battleState.questions[battleState.questionIndex];
+        }
+
+        function shuffleQuestions(questions) {
+            const shuffled = [...questions];
+            for (let index = shuffled.length - 1; index > 0; index -= 1) {
+                const swapIndex = Math.floor(Math.random() * (index + 1));
+                [shuffled[index], shuffled[swapIndex]] = [shuffled[swapIndex], shuffled[index]];
+            }
+            return shuffled;
+        }
+
+        function getQuestionWeight(question) {
+            return question.type === 'input' ? 2 : 1;
+        }
+
+        function renderQuestion() {
+            const question = getCurrentQuestion();
+            if (!question) {
+                showResult('victory');
+                return;
+            }
+
+            els.question.textContent = question.prompt;
+            els.typeCopy.textContent = question.type === 'mcq' ? 'Multiple choice challenge' : 'Input challenge';
+            els.snippet.textContent = question.type === 'input'
+                ? 'Complete the code in the editor below.'
+                : question.code;
+            els.hint.textContent = question.hint;
+            els.answers.innerHTML = '';
+            els.answers.classList.toggle('input-mode', question.type === 'input');
+
+            if (question.type === 'mcq') {
+                question.choices.forEach(choice => {
+                    const button = document.createElement('button');
+                    button.className = 'answer-btn';
+                    button.type = 'button';
+                    button.textContent = choice;
+                    button.onclick = () => handleAnswer(choice, button);
+                    els.answers.appendChild(button);
+                });
+                return;
+            }
+
+            const wrap = document.createElement('div');
+            wrap.className = 'answer-input-wrap';
+
+            const editorShell = document.createElement('div');
+            editorShell.className = 'answer-editor-shell';
+
+            const editorTopbar = document.createElement('div');
+            editorTopbar.className = 'answer-editor-topbar';
+            editorTopbar.innerHTML = `
+                <div class="editor-dots">
+                    <span></span><span></span><span></span>
+                </div>
+                <div class="editor-file-name">answer.py</div>
+            `;
+
+            const editorBody = document.createElement('div');
+            editorBody.className = 'answer-editor-body';
+
+            const editorHost = document.createElement('div');
+            editorHost.className = 'answer-input';
+            editorHost.id = `battle-editor-${battleState.questionIndex}`;
+
+            const submit = document.createElement('button');
+            submit.className = 'answer-submit-btn';
+            submit.type = 'button';
+            submit.textContent = 'Attack';
+            submit.onclick = () => handleAnswer(getEditorValue(), editorHost);
+
+            editorBody.appendChild(editorHost);
+            editorShell.appendChild(editorTopbar);
+            editorShell.appendChild(editorBody);
+            wrap.appendChild(editorShell);
+            wrap.appendChild(submit);
+            els.answers.appendChild(wrap);
+            mountCodeEditor(editorHost, question);
+        }
+
+        function normalizeAnswer(value) {
+            return String(value).trim().toLowerCase();
+        }
+
+        function normalizeCode(value) {
+            return String(value)
+                .replace(/\r\n/g, '\n')
+                .replace(/[ \t]+/g, ' ')
+                .replace(/\n\s*/g, '\n')
+                .trim()
+                .toLowerCase();
+        }
+
+        function getExpectedInputCode(question) {
+            if (question.completedCode) {
+                return question.completedCode;
+            }
+            return String(question.code).replace('___', question.answer);
+        }
+
+        function handleAnswer(value, triggerEl) {
+            if (battleState.locked || battleState.finished) {
+                return;
+            }
+
+            const question = getCurrentQuestion();
+            const isCorrect = question.type === 'input'
+                ? normalizeCode(value) === normalizeCode(getExpectedInputCode(question))
+                : normalizeAnswer(value) === normalizeAnswer(question.answer);
+            battleState.locked = true;
+            disableAnswerControls();
+
+            if (question.type === 'mcq' && triggerEl instanceof HTMLElement) {
+                triggerEl.classList.add(isCorrect ? 'correct-flash' : 'wrong-flash');
+            }
+
+            if (isCorrect) {
+                processCorrectAnswer();
+                return;
+            }
+
+            if (question.type === 'input' && triggerEl instanceof HTMLElement) {
+                triggerEl.classList.add('wrong-input');
+            }
+            processWrongAnswer(question.answer);
+        }
+
+        function disableAnswerControls() {
+            els.answers.querySelectorAll('button, input').forEach(control => {
+                control.disabled = true;
+            });
+            if (battleState.editor) {
+                battleState.editor.setReadOnly(true);
+            }
+        }
+
+        function mountCodeEditor(host, question) {
+            if (!window.ace) {
+                host.textContent = question.code || '';
+                host.setAttribute('contenteditable', 'true');
+                host.focus();
+                battleState.editor = {
+                    getValue: () => host.textContent,
+                    setReadOnly: isReadOnly => host.setAttribute('contenteditable', String(!isReadOnly)),
+                    focus: () => host.focus(),
+                    destroy: () => { }
+                };
+                return;
+            }
+
+            if (battleState.editor && typeof battleState.editor.destroy === 'function') {
+                battleState.editor.destroy();
+            }
+
+            const editor = window.ace.edit(host);
+            editor.session.setMode(`ace/mode/${question.editorMode || 'python'}`);
+            editor.setTheme('ace/theme/gob');
+            editor.setOptions({
+                fontSize: '15px',
+                showPrintMargin: false,
+                highlightActiveLine: true,
+                wrap: true,
+                tabSize: 4,
+                useSoftTabs: true,
+                enableBasicAutocompletion: true,
+                enableLiveAutocompletion: true
+            });
+            editor.session.setUseWorker(false);
+            editor.setValue(question.code || '', -1);
+            editor.commands.addCommand({
+                name: 'submitBattleAnswer',
+                bindKey: { win: 'Ctrl-Enter', mac: 'Command-Enter' },
+                exec: () => handleAnswer(getEditorValue(), host)
+            });
+            focusPlaceholder(editor, question.code || '');
+            editor.focus();
+            battleState.editor = editor;
+        }
+
+        function focusPlaceholder(editor, template) {
+            const marker = '___';
+            const index = String(template).indexOf(marker);
+            if (index === -1) {
+                return;
+            }
+
+            const before = template.slice(0, index);
+            const row = before.split('\n').length - 1;
+            const column = before.split('\n').pop().length;
+            const AceRange = window.ace.require('ace/range').Range;
+            editor.selection.setRange(new AceRange(row, column, row, column + marker.length));
+        }
+
+        function getEditorValue() {
+            if (battleState.editor && typeof battleState.editor.getValue === 'function') {
+                return battleState.editor.getValue();
+            }
+            return '';
+        }
+
+        function getEnemyDamagePerQuestion() {
+            const currentQuestion = getCurrentQuestion();
+            const remainingQuestions = battleState.questions.slice(battleState.questionIndex);
+            const remainingWeight = Math.max(1, remainingQuestions.reduce((total, question) => {
+                return total + getQuestionWeight(question);
+            }, 0));
+            const currentWeight = Math.max(1, getQuestionWeight(currentQuestion));
+            return Math.ceil((battleState.enemyHP * currentWeight) / remainingWeight);
+        }
+
+        function processCorrectAnswer() {
+            const damage = getEnemyDamagePerQuestion();
+            battleState.enemyHP = Math.max(0, battleState.enemyHP - damage);
+            updateHPBars();
+            setFeedback('Correct! Enemy takes damage.', true);
+            spawnDamage(`-${damage}`, 'player-dmg');
+            window.dispatchEvent(new CustomEvent('studyquest:battle-correct', {
+                detail: {
+                    damage,
+                    playerHP: battleState.playerHP,
+                    enemyHP: battleState.enemyHP,
+                    maxPlayerHP: battleState.maxPlayerHP,
+                    maxEnemyHP: battleState.maxEnemyHP
+                }
+            }));
+            playSpriteState('player', 'attack');
+            playSpriteState('enemy', battleState.enemyHP === 0 ? 'dead' : 'hurt');
+            animateHit(els.enemySprite);
+
+            if (battleState.enemyHP === 0) {
+                window.setTimeout(() => showResult('victory'), 700);
+                return;
+            }
+
+            battleState.questionIndex += 1;
+            window.setTimeout(() => {
+                battleState.locked = false;
+                renderQuestion();
+            }, 900);
+        }
+
+        function processWrongAnswer(correctAnswer) {
+            const damage = 20;
+            battleState.playerHP = Math.max(0, battleState.playerHP - damage);
+            updateHPBars();
+            setFeedback(`Wrong! Answer: ${correctAnswer}`, false);
+            spawnDamage(`-${damage}`, 'enemy-dmg');
+            window.dispatchEvent(new CustomEvent('studyquest:battle-wrong', {
+                detail: {
+                    damage,
+                    playerHP: battleState.playerHP,
+                    enemyHP: battleState.enemyHP,
+                    maxPlayerHP: battleState.maxPlayerHP,
+                    maxEnemyHP: battleState.maxEnemyHP
+                }
+            }));
+            playSpriteState('enemy', 'attack');
+            playSpriteState('player', 'hurt');
+
+            if (battleState.playerHP === 0) {
+                window.setTimeout(() => showResult('defeat'), 700);
+                return;
+            }
+
+            window.setTimeout(() => {
+                battleState.locked = false;
+                renderQuestion();
+            }, 1100);
+        }
+
+        function setFeedback(message, correct) {
+            els.feedback.textContent = message;
+            els.feedback.classList.toggle('correct', correct);
+            els.feedback.classList.toggle('wrong', !correct);
+        }
+
+        function animateHit(target) {
+            target.classList.remove('shake-hit', 'flash-red');
+            void target.offsetWidth;
+            target.classList.add('shake-hit', 'flash-red');
+        }
+
+        function spawnDamage(text, className) {
+            const floatEl = document.createElement('div');
+            floatEl.className = `damage-float ${className}`;
+            floatEl.textContent = text;
+            els.arena.appendChild(floatEl);
+            window.setTimeout(() => floatEl.remove(), 800);
+        }
+
+        function showResult(type) {
+            battleState.finished = true;
+            window.dispatchEvent(new CustomEvent('studyquest:battle-finished', {
+                detail: {
+                    type,
+                    playerHP: battleState.playerHP,
+                    enemyHP: battleState.enemyHP
+                }
+            }));
+            els.overlay.classList.add('open');
+            els.rewardCoins.textContent = `+${battleConfig.rewards.coins} coins`;
+            els.rewardXp.textContent = `+${battleConfig.rewards.xp} XP`;
+            els.resultActions.innerHTML = '';
+
+            if (type === 'victory') {
+                els.resultTitle.textContent = 'Victory';
+                els.resultTitle.className = 'result-title victory';
+                els.resultMsg.textContent = `${battleConfig.enemyName} defeated. Rewards granted.`;
+                playSpriteState('enemy', 'dead');
+                playSpriteState('player', 'idle');
+
+                const returnBtn = createResultButton('Return to Map', 'result-btn victory-btn', returnToMap);
+                els.resultActions.appendChild(returnBtn);
+                return;
+            }
+
+            els.resultTitle.textContent = 'Defeat';
+            els.resultTitle.className = 'result-title defeat';
+            els.resultMsg.textContent = 'Try stage again or retreat.';
+            els.rewardCoins.textContent = '+0 coins';
+            els.rewardXp.textContent = '+0 XP';
+            playSpriteState('enemy', 'idle');
+            playSpriteState('player', 'hurt');
+
+            const retryBtn = createResultButton('Try Again', 'result-btn defeat-btn', retryBattle);
+            const retreatBtn = createResultButton('Return to Map', 'result-btn retreat-btn', returnToMap);
+            els.resultActions.appendChild(retryBtn);
+            els.resultActions.appendChild(retreatBtn);
+        }
+
+        function getSpriteDefinition(side, state) {
+            const spriteMap = side === 'player' ? playerSprites : defaultEnemySprites;
+            const stateMap = side === 'enemy' && battleConfig.enemySprites ? battleConfig.enemySprites : spriteMap;
+            return stateMap[state] || stateMap.idle || spriteMap.idle;
+        }
+
+        function renderSpriteFrame(element, spriteDef, frameIndex) {
+            const frame = spriteDef.frames[frameIndex % spriteDef.frames.length];
+            const column = frame % spriteDef.columns;
+            const row = Math.floor(frame / spriteDef.columns);
+            const frameWidth = 128;
+            const frameHeight = 128;
+            element.style.backgroundImage = `url('${spriteDef.src}')`;
+            element.style.backgroundSize = `${spriteDef.columns * frameWidth}px ${spriteDef.rows * frameHeight}px`;
+            element.style.backgroundPosition = `${-column * frameWidth}px ${-row * frameHeight}px`;
+        }
+
+        function clearSpriteTimer(side) {
+            if (battleState.spriteTimers[side]) {
+                window.clearInterval(battleState.spriteTimers[side]);
+                battleState.spriteTimers[side] = null;
+            }
+        }
+
+        function playSpriteState(side, state, onDone) {
+            const spriteDef = getSpriteDefinition(side, state);
+            const element = side === 'player' ? els.playerGraphic : els.enemyGraphic;
+            const frameDelay = Math.max(60, Math.floor(1000 / (spriteDef.fps || 8)));
+            let frameIndex = 0;
+
+            window.dispatchEvent(new CustomEvent('studyquest:sprite-state', {
+                detail: { side, state }
+            }));
+
+            clearSpriteTimer(side);
+            renderSpriteFrame(element, spriteDef, frameIndex);
+
+            if (spriteDef.frames.length <= 1 && spriteDef.loop !== true) {
+                if (typeof onDone === 'function') {
+                    onDone();
+                }
+                return;
+            }
+
+            battleState.spriteTimers[side] = window.setInterval(() => {
+                frameIndex += 1;
+                if (frameIndex >= spriteDef.frames.length) {
+                    if (spriteDef.loop) {
+                        frameIndex = 0;
+                        renderSpriteFrame(element, spriteDef, frameIndex);
+                        return;
+                    }
+
+                    clearSpriteTimer(side);
+                    renderSpriteFrame(element, spriteDef, spriteDef.frames.length - 1);
+                    if (typeof onDone === 'function') {
+                        onDone();
+                    } else if (state !== 'idle' && state !== 'dead') {
+                        playSpriteState(side, 'idle');
+                    }
+                    return;
+                }
+
+                renderSpriteFrame(element, spriteDef, frameIndex);
+            }, frameDelay);
+        }
+
+        function playSpriteSequence(side, states) {
+            const [currentState, ...rest] = states;
+            if (!currentState) {
+                playSpriteState(side, 'idle');
+                return;
+            }
+
+            playSpriteState(side, currentState, () => {
+                if (rest.length === 0) {
+                    if (currentState !== 'dead') {
+                        playSpriteState(side, 'idle');
+                    }
+                    return;
+                }
+                playSpriteSequence(side, rest);
+            });
+        }
+
+        function createResultButton(label, className, handler) {
+            const button = document.createElement('button');
+            button.type = 'button';
+            button.className = className;
+            button.textContent = label;
+            button.onclick = handler;
+            return button;
+        }
+
+        function retryBattle() {
+            window.location.href = `Battle.html?island=${islandId}&stage=${stageId}`;
+        }
+
+        function returnToMap() {
+            window.location.href = 'Index.html';
+        }
+
+        initBattle();
+    </script>
+    <script type="module" src="main.js"></script>
+    <script type="module" src="scripts/battle-app.js"></script>
+    <script type="module" src="scripts/battle-phaser.js"></script>
+</body>
+
+</html>

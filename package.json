@@ -1,0 +1,10 @@
+{
+  "name": "studyquest-wad",
+  "version": "1.0.0",
+  "private": true,
+  "description": "StudyQuest Node.js backend",
+  "main": "server.js",
+  "scripts": {
+    "start": "node server.js"
+  }
+}

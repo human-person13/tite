@@ -1,0 +1,1055 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="materialize/css/materialize.min.css">
+    <link rel="stylesheet" href="lahat.css">
+    <link rel="stylesheet" href="index.css">
+    <link
+        href="https://fonts.googleapis.com/css2?family=MedievalSharp&family=Cinzel:wght@400;600;700&family=Crimson+Text:ital,wght@0,400;0,600;1,400&display=swap"
+        rel="stylesheet">
+    <title>StudyQuest</title>
+
+</head>
+
+<body>
+
+    <!-- ═══════════════════════════════════════
+         TOP BAR
+    ═══════════════════════════════════════ -->
+    <div class="topbar">
+        <!-- Profile button top-left — shows mini stats popup -->
+        <button class="profile-btn" onclick="toggleMiniProfile()" id="profile-btn-avatar">PL</button>
+
+        <div class="topbar-title">⚔ StudyQuest ⚔</div>
+
+        <!-- Java hook: update id="currency-display" with player's coins -->
+        <div class="currency-chip" id="currency-display">🪙 1,240</div>
+    </div>
+
+    <!-- Click-outside backdrop for mini popup -->
+    <div class="mini-backdrop" id="mini-backdrop" onclick="closeMiniProfile()"></div>
+
+    <!-- Mini profile stats popup -->
+    <div class="mini-profile-popup" id="mini-profile-popup">
+        <div class="mini-profile-header">
+            <!-- Java hook: id="mini-avatar", "mini-name", "mini-rank" -->
+            <div class="mini-profile-avatar" id="mini-avatar">PL</div>
+            <div>
+                <div class="mini-profile-name" id="mini-name">Player One</div>
+                <div class="mini-profile-rank" id="mini-rank">⚔ Knight Rank</div>
+            </div>
+        </div>
+        <div class="mini-profile-body">
+            <!-- Java hook: id="mini-stat-*" — update via setPlayerProfile() -->
+            <div class="mini-stat"><span class="mini-stat-lbl">Level</span><span class="mini-stat-val"
+                    id="mini-stat-level">12</span></div>
+            <div class="mini-stat"><span class="mini-stat-lbl">XP</span><span class="mini-stat-val"
+                    id="mini-stat-xp">3,450 / 5,000</span></div>
+            <div class="mini-stat"><span class="mini-stat-lbl">Stages Cleared</span><span class="mini-stat-val"
+                    id="mini-stat-stages">24</span></div>
+            <div class="mini-stat"><span class="mini-stat-lbl">Win Rate</span><span class="mini-stat-val"
+                    id="mini-stat-winrate">78%</span></div>
+            <div class="mini-stat"><span class="mini-stat-lbl">Coins</span><span class="mini-stat-val"
+                    id="mini-stat-coins">1,240</span></div>
+            <button class="mini-profile-close-btn" onclick="closeMiniProfile()">Close</button>
+            <button class="mini-profile-close-btn" onclick="logout()">Logout</button>
+        </div>
+    </div>
+
+
+    <!-- ═══════════════════════════════════════════════════════════
+         ADVENTURER ID CARD
+         Opens when the top-left avatar button is clicked.
+         Contains view mode AND inline edit mode (toggled by "Edit Profile").
+         Also handles the old home-tab "Profile" brown button via same function.
+    ═══════════════════════════════════════════════════════════ -->
+    <div class="profile-overlay" id="profile-overlay" onclick="closeProfileOutside(event)">
+
+        <div class="id-card" id="id-card">
+
+            <!-- Close ✕ -->
+            <button class="id-card-close" onclick="toggleProfile()" title="Close">✕</button>
+
+            <div class="id-card-inner">
+
+                <!-- ══ LEFT COLUMN ══ -->
+                <div class="id-left">
+
+                    <!-- Avatar circle -->
+                    <div class="id-avatar-wrap">
+                        <div class="id-avatar-circle" id="id-avatar-circle">
+                            <!--
+                                Java hook: id="id-avatar-circle"
+                                Default shows SVG silhouette.
+                                After player uploads a photo, replace inner HTML with:
+                                <img src="[upload-url]" alt="avatar">
+                                via setAvatarImage(url) below.
+                            -->
+                            <svg viewBox="0 0 60 60" fill="#4a8ec9" xmlns="http://www.w3.org/2000/svg">
+                                <circle cx="30" cy="22" r="13" />
+                                <ellipse cx="30" cy="52" rx="20" ry="14" />
+                            </svg>
+                        </div>
+                    </div>
+
+                    <!--
+                        Java hook: onclick on this button should open a file picker,
+                        upload the selected image to your server, then call setAvatarImage(url).
+                        Disable this button in view mode if you want (optional UX decision).
+                    -->
+                    <button class="id-change-pic-btn" id="id-change-pic-btn" onclick="handleChangePicture()">Change
+                        Picture</button>
+
+                    <!-- Emblem — uses temp logo as shield emblem -->
+                    <img class="id-emblem" src="assets/temporary/temp.png" alt="StudyQuest Emblem"
+                        onerror="this.style.display='none'">
+                </div>
+
+                <!-- ══ RIGHT COLUMN ══ -->
+                <div class="id-right">
+
+                    <!-- Card header -->
+                    <div class="id-header">
+                        <span style="font-size:1.3rem;">🛡</span>
+                        <span class="id-title-main">StudyQuest</span>
+                        <span style="font-size:1.1rem;">⚔</span>
+                    </div>
+                    <div class="id-title-sub">Adventurer Card</div>
+
+                    <!-- ── NAME field ── -->
+                    <div class="id-field-row">
+                        <span class="id-field-label">Name:</span>
+                        <!--
+                            Java hook: id="id-val-name" — set textContent on page load via setPlayerProfile()
+                        -->
+                        <span class="id-field-value" id="id-val-name">Player One</span>
+                        <!--
+                            Java hook: id="id-inp-name"
+                            On save, POST this value to /api/player/update-name
+                        -->
+                        <input class="id-field-input" id="id-inp-name" type="text" autocomplete="off"
+                            placeholder="Enter new name…">
+                    </div>
+
+                    <!-- ── PASSWORD field ── -->
+                    <div class="id-field-row">
+                        <span class="id-field-label">Password:</span>
+                        <!-- Always shows bullets in view mode -->
+                        <span class="id-field-value" id="id-val-pw">••••••••</span>
+                        <!--
+                            Java hook: id="id-inp-pw"
+                            New password input — shown only in edit mode.
+                            On save, validate against confirm field then POST to /api/player/update-password
+                        -->
+                        <input class="id-field-input" id="id-inp-pw" type="password" placeholder="New password…">
+                    </div>
+
+                    <!-- ── CONFIRM PASSWORD (only visible in edit mode) ── -->
+                    <div class="id-field-row id-confirm-row" id="id-confirm-row">
+                        <span class="id-field-label">Confirm:</span>
+                        <!--
+                            Java hook: id="id-inp-pw-confirm"
+                            Must match id-inp-pw before save is allowed.
+                            Validation happens client-side in requestSave(); server should also verify.
+                        -->
+                        <input class="id-field-input" id="id-inp-pw-confirm" type="password"
+                            placeholder="Confirm password…" style="display:block;">
+                    </div>
+
+                    <!-- ── EMAIL field (read-only, never editable) ── -->
+                    <div class="id-field-row">
+                        <span class="id-field-label">Email:</span>
+                        <!--
+                            Java hook: id="id-val-email" — set textContent on page load via setPlayerProfile()
+                            This field has NO input counterpart — email cannot be changed here.
+                        -->
+                        <span class="id-field-value id-email-value locked-email" id="id-val-email">
+                            <a href="/cdn-cgi/l/email-protection" class="__cf_email__"
+                                data-cfemail="a1d1cdc0d8c4d3e1c4d9c0ccd1cdc48fc2cecc">[email&#160;protected]</a>
+                        </span>
+                    </div>
+
+                    <!-- ── Button row ── -->
+                    <div class="id-btn-row">
+                        <!-- Cancel edit — restores original values -->
+                        <button class="id-cancel-btn" id="id-cancel-btn" onclick="cancelEdit()">Cancel</button>
+
+                        <!-- Save — triggers confirmation modal -->
+                        <button class="id-save-btn" id="id-save-btn" onclick="requestSave()">Save ⚔</button>
+
+                        <!-- Edit Profile — enters edit mode -->
+                        <button class="id-edit-btn" id="id-edit-btn" onclick="enterEditMode()">Edit Profile</button>
+                    </div>
+
+                </div><!-- /id-right -->
+            </div><!-- /id-card-inner -->
+        </div><!-- /id-card -->
+    </div><!-- /profile-overlay -->
+
+
+    <!-- ═══════════════════════════════════════════════════════════
+         SAVE CONFIRMATION MODAL
+         Appears on top of the ID card when "Save ⚔" is clicked.
+    ═══════════════════════════════════════════════════════════ -->
+    <div class="confirm-overlay" id="confirm-overlay">
+        <div class="confirm-box">
+            <p>⚔ Are you sure you want to<br><strong>save these changes?</strong></p>
+            <div class="confirm-actions">
+                <!--
+                    Java hook: confirmSave() reads the input fields and
+                    POSTs to your Java servlet. Wire it in the function below.
+                -->
+                <button class="confirm-yes" onclick="confirmSave()">Yes, Save</button>
+                <button class="confirm-no" onclick="dismissConfirm()">Cancel</button>
+            </div>
+        </div>
+    </div>
+
+
+    <!-- ═══════════════════════════════════════
+         PAGE CONTENT
+    ═══════════════════════════════════════ -->
+    <div class="page-content">
+
+        <!-- ══════════════════════
+             HOME TAB
+        ══════════════════════ -->
+        <div class="tab-panel active" id="tab-home">
+            <div class="home-layout">
+
+                <!-- Logo / mascot side -->
+                <div class="home-logo-side">
+                    <!--
+                        Replace src with your actual logo path.
+                        Java hook: you can swap this src dynamically if the logo changes per season/event.
+                    -->
+                    <img src="assets/temporary/temp.png" alt="StudyQuest Logo" class="home-logo-img"
+                        onerror="this.style.fontSize='4rem'; this.outerHTML='<div style=\'font-size:4rem;text-align:center\'>⚔🛡⚔</div>'">
+                </div>
+
+                <!-- Navigation buttons side -->
+                <div class="home-btns-side">
+
+                    <!-- PLAY — green fantasy button -->
+                    <button class="fantasy-btn green" onclick="switchTab('play')">
+                        <span class="fantasy-btn-badge">⚔</span>
+                        <span class="fantasy-btn-label">Play</span>
+                    </button>
+
+                    <!-- SHOP — parchment fantasy button -->
+                    <button class="fantasy-btn parchment" onclick="switchTab('shop')">
+                        <span class="fantasy-btn-badge">⛏</span>
+                        <span class="fantasy-btn-label">Shop</span>
+                    </button>
+
+                    <!-- PRACTICE — green fantasy button -->
+                    <button class="fantasy-btn green" onclick="switchTab('practice')">
+                        <span class="fantasy-btn-badge">🤺</span>
+                        <span class="fantasy-btn-label">Practice</span>
+                    </button>
+
+                    <!-- PROFILE — brown fantasy button — opens ID card -->
+                    <button class="fantasy-btn brown" onclick="toggleProfile()">
+                        <span class="fantasy-btn-badge">👤</span>
+                        <span class="fantasy-btn-label">Profile</span>
+                    </button>
+
+                </div>
+            </div>
+        </div>
+
+
+        <!-- ══════════════════════
+             PLAY / ISLAND SELECTOR TAB
+        ══════════════════════ -->
+        <div class="tab-panel" id="tab-play">
+            <div class="section-title">Select Island</div>
+
+            <!--
+                Java hook: populate this grid dynamically via setIslands(islandsArray).
+                Each card uses:
+                  data-island-id   — unique ID
+                  data-status      — "unlocked" | "locked"
+                  onclick          — startIsland(id) for unlocked cards
+                Progress pill text = "cleared/total ★"
+            -->
+            <div class="islands-grid" id="islands-grid">
+
+                <!-- UNLOCKED ISLAND CARD — template -->
+                <button class="island-card" data-island-id="1" data-status="unlocked"
+                    onclick="openIslandModal(1, 'Island 1')">
+                    <div class="island-icon-box">
+                        <img src="assets/temporary/temp.png" alt="Island 1"
+                            onerror="this.outerHTML='<span style=\'font-size:2rem\'>🗺</span>'">
+                    </div>
+                    <div class="island-info-box">
+                        <div class="island-name">Island 1</div>
+                        <div class="island-progress-pill" id="island-progress-1">— 3/10 ★ —</div>
+                    </div>
+                </button>
+
+                <button class="island-card" data-island-id="2" data-status="unlocked"
+                    onclick="openIslandModal(2, 'Island 2')">
+                    <div class="island-icon-box">
+                        <img src="assets/temporary/temp.png" alt="Island 2"
+                            onerror="this.outerHTML='<span style=\'font-size:2rem\'>🗺</span>'">
+                    </div>
+                    <div class="island-info-box">
+                        <div class="island-name">Island 2</div>
+                        <div class="island-progress-pill" id="island-progress-2">— 3/10 ★ —</div>
+                    </div>
+                </button>
+
+                <!-- LOCKED ISLAND CARD — template -->
+                <div class="island-card locked" data-island-id="3" data-status="locked">
+                    <div class="island-icon-box">
+                        <span class="lock-icon">🔒</span>
+                    </div>
+                    <div class="island-info-box">
+                        <div class="island-name">Locked</div>
+                    </div>
+                </div>
+
+                <div class="island-card locked" data-island-id="4" data-status="locked">
+                    <div class="island-icon-box">
+                        <span class="lock-icon">🔒</span>
+                    </div>
+                    <div class="island-info-box">
+                        <div class="island-name">Locked</div>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+
+
+<!-- ═══════════════════════════════════════
+     COMMISSION POPUP (MISSION POSTER)
+═══════════════════════════════════════ -->
+
+<div class="commission-overlay" id="commission-overlay">
+
+    <div class="commission-card">
+
+        <!-- Title -->
+        <div class="commission-header">
+            📜 Commission Notice
+        </div>
+
+        <!-- Mission Story -->
+        <div class="commission-body">
+
+            <h5 id="commission-title">
+                Defeat the Goblin Bug
+            </h5>
+
+            <p id="commission-story">
+                A wild Goblin Bug has appeared in the forest!
+                To defeat it, you must learn the magic of
+                <strong>Python Print Spell</strong>.
+            </p>
+
+            <!-- Python Lesson -->
+            <div class="commission-lesson">
+
+                <h6>🧙 Magic Lesson</h6>
+
+                <p id="commission-lesson-text">
+                    The <b>print()</b> spell allows you to display
+                    words to the screen.
+                </p>
+
+                <pre class="code-scroll">
+<code id="commission-code">
+print("Hello Adventurer!")
+</code>
+                </pre>
+
+            </div>
+
+        </div>
+
+        <!-- Buttons -->
+        <div class="commission-actions">
+
+            <button class="commission-cancel"
+                onclick="closeCommission()">
+                Cancel
+            </button>
+
+            <button class="commission-accept"
+                onclick="acceptCommission()">
+                Accept Commission ⚔
+            </button>
+
+        </div>
+
+    </div>
+
+</div>
+
+
+        <!-- ══════════════════════
+             PRACTICE TAB
+        ══════════════════════ -->
+        <div class="tab-panel" id="tab-practice">
+            <div class="section-title">Practice Arena</div>
+            <div class="practice-grid">
+                <!-- Java hook: data-practice-id, onclick="startPractice(mode)" -->
+                <button class="practice-card" data-practice-id="vocab" onclick="startPractice('vocab')">
+                    <span class="practice-icon">📖</span>
+                    <div class="practice-info">
+                        <h4>Vocabulary Drill</h4>
+                        <p>Sharpen your word knowledge</p>
+                    </div>
+                    <span class="practice-arrow">›</span>
+                </button>
+                <button class="practice-card" data-practice-id="speed" onclick="startPractice('speed')">
+                    <span class="practice-icon">⚡</span>
+                    <div class="practice-info">
+                        <h4>Speed Round</h4>
+                        <p>Race against the clock</p>
+                    </div>
+                    <span class="practice-arrow">›</span>
+                </button>
+                <button class="practice-card" data-practice-id="survival" onclick="startPractice('survival')">
+                    <span class="practice-icon">🛡</span>
+                    <div class="practice-info">
+                        <h4>Survival Mode</h4>
+                        <p>How long can you last?</p>
+                    </div>
+                    <span class="practice-arrow">›</span>
+                </button>
+                <button class="practice-card" data-practice-id="review" onclick="startPractice('review')">
+                    <span class="practice-icon">🔄</span>
+                    <div class="practice-info">
+                        <h4>Review Mistakes</h4>
+                        <p>Go over what you got wrong</p>
+                    </div>
+                    <span class="practice-arrow">›</span>
+                </button>
+            </div>
+        </div>
+
+
+        <!-- ══════════════════════
+             SHOP TAB
+        ══════════════════════ -->
+        <div class="tab-panel" id="tab-shop">
+            <div class="section-title">Shop</div>
+            <div class="shop-grid" id="shop-grid">
+                <!-- Java hook: populate via setShopItems(items) or statically -->
+                <div class="shop-card" data-item-id="shield_skin">
+                    <div class="shop-img">🛡</div>
+                    <div class="shop-info">
+                        <div class="shop-name">Iron Shield</div>
+                        <div class="shop-price">🪙 500</div>
+                        <button class="shop-buy-btn" onclick="buyItem('shield_skin')">Buy</button>
+                    </div>
+                </div>
+                <div class="shop-card" data-item-id="sword_skin">
+                    <div class="shop-img">⚔</div>
+                    <div class="shop-info">
+                        <div class="shop-name">Dragon Blade</div>
+                        <div class="shop-price">🪙 800</div>
+                        <button class="shop-buy-btn" onclick="buyItem('sword_skin')">Buy</button>
+                    </div>
+                </div>
+                <div class="shop-card" data-item-id="hint_pack">
+                    <div class="shop-img">💡</div>
+                    <div class="shop-info">
+                        <div class="shop-name">Hint Pack ×5</div>
+                        <div class="shop-price">🪙 300</div>
+                        <button class="shop-buy-btn" onclick="buyItem('hint_pack')">Buy</button>
+                    </div>
+                </div>
+                <div class="shop-card" data-item-id="xp_boost">
+                    <div class="shop-img">✨</div>
+                    <div class="shop-info">
+                        <div class="shop-name">XP Boost</div>
+                        <div class="shop-price">🪙 400</div>
+                        <button class="shop-buy-btn" onclick="buyItem('xp_boost')">Buy</button>
+                    </div>
+                </div>
+            </div>
+            <!-- ══════════════════════
+             BATTLE TAB
+        ══════════════════════ -->
+            <div class="tab-panel" id="tab-battle">
+                <div class="battle-layout">
+                    <!-- TOP: Enemy Area -->
+                    <div class="battle-enemy-area">
+                        <div class="hp-bar-container">
+                            <div class="hp-bar-label">Enemy HP</div>
+                            <div class="hp-bar-bg">
+                                <div class="hp-bar-fill enemy-hp-fill" id="enemy-hp-fill" style="width: 100%;"></div>
+                            </div>
+                        </div>
+                        <div class="enemy-sprite-box" id="enemy-sprite">
+                            <span class="enemy-emoji" id="enemy-graphic">🐉</span>
+                        </div>
+                        <div class="enemy-name" id="enemy-name">Dragon Bug</div>
+                    </div>
+
+                    <!-- MIDDLE: Arena / Feedback Area -->
+                    <div class="battle-arena">
+                        <div class="battle-feedback" id="battle-feedback">Prepare for Battle!</div>
+                    </div>
+
+                    <!-- BOTTOM: Player & Quiz Area -->
+                    <div class="battle-player-area">
+                        <div class="hp-bar-container player-hp-box">
+                            <div class="hp-bar-label">Player HP</div>
+                            <div class="hp-bar-bg">
+                                <div class="hp-bar-fill player-hp-fill" id="player-hp-fill" style="width: 100%;"></div>
+                            </div>
+                        </div>
+
+                        <div class="coding-quiz-box">
+                            <div class="quiz-question" id="quiz-question">Question goes here</div>
+                            <div class="quiz-code-snippet" id="quiz-code-snippet">
+                                <code>Code snippet goes here</code>
+                            </div>
+                            <!-- Answer container can hold either buttons or text input -->
+                            <div class="quiz-answers" id="quiz-answers">
+                                <!-- Populated by JS -->
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+        </div><!-- /page-content -->
+
+        <!-- ═══════════════════════════════════════════════════════════
+         ISLAND LEVEL MODAL
+         Opens when an unlocked island card is clicked.
+         Java hook: call openIslandModal(islandId, islandName, levelsArray) to populate.
+    ═══════════════════════════════════════════════════════════ -->
+        <div class="island-modal-overlay" id="island-modal-overlay" onclick="closeIslandModalOutside(event)">
+            <div class="island-modal">
+                <div class="island-modal-header">
+                    <!-- Java hook: id="island-modal-title" updated by openIslandModal() -->
+                    <div class="island-modal-title" id="island-modal-title">⚔ Island 1 — Stages</div>
+                    <button class="island-modal-close" onclick="closeIslandModal()">✕</button>
+                </div>
+                <div class="island-modal-body">
+                    <!--
+                    Java hook: id="levels-grid-modal"
+                    Populated dynamically by openIslandModal(islandId, name, levelsArray).
+                    levelsArray = [{ id, status:'completed'|'unlocked'|'locked', stars:0-3 }]
+                    Each cell calls: startLevel(levelId, islandId)
+                -->
+                    <div class="levels-grid-modal" id="levels-grid-modal">
+                        <!-- Populated by JS -->
+                    </div>
+                </div>
+            </div>
+        </div>
+
+
+        <!-- ═══════════════════════════════════════
+         BOTTOM NAV TABS
+    ═══════════════════════════════════════ -->
+        <nav class="nav-tabs">
+            <button class="nav-tab active" id="nav-home" onclick="switchTab('home')">
+                <span class="tab-icon">🏠</span> HOME
+            </button>
+            <button class="nav-tab" id="nav-play" onclick="switchTab('play')">
+                <span class="tab-icon">⚔</span> PLAY
+            </button>
+            <button class="nav-tab" id="nav-practice" onclick="switchTab('practice')">
+                <span class="tab-icon">🛡</span> PRACTICE
+            </button>
+            <button class="nav-tab" id="nav-shop" onclick="switchTab('shop')">
+                <span class="tab-icon">🏪</span> SHOP
+            </button>
+        </nav>
+
+
+        <script data-cfasync="false" src="/cdn-cgi/scripts/5c5dd728/cloudflare-static/email-decode.min.js"></script>
+        <script src="materialize/js/materialize.min.js"></script>
+        <script>
+            /* ════════════════════════════════════════
+               UI NAVIGATION
+            ════════════════════════════════════════ */
+            function switchTab(name) {
+                document.querySelectorAll('.tab-panel').forEach(p => p.classList.remove('active'));
+                document.querySelectorAll('.nav-tab').forEach(b => b.classList.remove('active'));
+                document.getElementById('tab-' + name).classList.add('active');
+                const navBtn = document.getElementById('nav-' + name);
+                if (navBtn) navBtn.classList.add('active');
+            }
+
+            /* ════════════════════════════════════════
+               MINI PROFILE POPUP (top-left avatar)
+            ════════════════════════════════════════ */
+            function toggleMiniProfile() {
+                const popup = document.getElementById('mini-profile-popup');
+                const backdrop = document.getElementById('mini-backdrop');
+                const isOpen = popup.classList.contains('open');
+                popup.classList.toggle('open', !isOpen);
+                backdrop.classList.toggle('open', !isOpen);
+            }
+            function closeMiniProfile() {
+                document.getElementById('mini-profile-popup').classList.remove('open');
+                document.getElementById('mini-backdrop').classList.remove('open');
+            }
+
+
+            /* ════════════════════════════════════════
+               ADVENTURER ID CARD — EDIT MODE
+            ════════════════════════════════════════ */
+
+            /* Snapshot of original values — restored on Cancel */
+            let _originalName = '';
+
+            function enterEditMode() {
+                const card = document.getElementById('id-card');
+                card.classList.add('edit-mode');
+
+                // Pre-fill name input with current displayed name
+                _originalName = document.getElementById('id-val-name').textContent.trim();
+                document.getElementById('id-inp-name').value = _originalName;
+
+                // Clear password inputs
+                document.getElementById('id-inp-pw').value = '';
+                document.getElementById('id-inp-pw-confirm').value = '';
+
+                // Focus name field
+                document.getElementById('id-inp-name').focus();
+            }
+
+            function cancelEdit() {
+                const card = document.getElementById('id-card');
+                card.classList.remove('edit-mode');
+
+                // Restore original name display
+                document.getElementById('id-val-name').textContent = _originalName;
+
+                // Clear inputs
+                document.getElementById('id-inp-name').value = '';
+                document.getElementById('id-inp-pw').value = '';
+                document.getElementById('id-inp-pw-confirm').value = '';
+            }
+
+
+            /* ════════════════════════════════════════
+               SAVE FLOW — confirmation modal
+            ════════════════════════════════════════ */
+
+            function requestSave() {
+                // Client-side validation before showing the confirmation modal
+                const newName = document.getElementById('id-inp-name').value.trim();
+                const newPw = document.getElementById('id-inp-pw').value;
+                const confPw = document.getElementById('id-inp-pw-confirm').value;
+
+                if (!newName) {
+                    alert('Name cannot be empty!');
+                    document.getElementById('id-inp-name').focus();
+                    return;
+                }
+
+                if (newPw || confPw) {
+                    if (newPw.length < 6) {
+                        alert('Password must be at least 6 characters.');
+                        document.getElementById('id-inp-pw').focus();
+                        return;
+                    }
+                    if (newPw !== confPw) {
+                        alert('Passwords do not match!');
+                        document.getElementById('id-inp-pw-confirm').focus();
+                        return;
+                    }
+                }
+
+                // All good — show confirmation modal
+                document.getElementById('confirm-overlay').classList.add('open');
+            }
+
+            function dismissConfirm() {
+                document.getElementById('confirm-overlay').classList.remove('open');
+            }
+
+            /**
+             * confirmSave — called when user clicks "Yes, Save" in the modal.
+             *
+             * ── JAVA BACKEND HOOK ──────────────────────────────────────────
+             * Build a payload from the input fields and POST it to your servlet.
+             *
+             * Payload shape:
+             *   {
+             *     name:        string   (always present — required field),
+             *     newPassword: string?  (only if player typed something; omit if blank)
+             *   }
+             *
+             * Suggested servlet: POST /api/player/update
+             *   → validates name uniqueness, hashes new password, persists, returns updated player JSON
+             *
+             * On success:
+             *   1. Call setPlayerProfile(updatedData) to refresh displayed values.
+             *   2. Call cancelEdit() to exit edit mode.
+             *   3. Call dismissConfirm() to close the modal.
+             *
+             * On error:
+             *   Show an error message to the user (e.g., "Name already taken").
+             * ──────────────────────────────────────────────────────────────
+             */
+            function confirmSave() {
+                const payload = {
+                    name: document.getElementById('id-inp-name').value.trim()
+                };
+                const newPw = document.getElementById('id-inp-pw').value;
+                if (newPw) payload.newPassword = newPw;
+
+                // TODO: Java — replace console.log with your fetch/XMLHttpRequest
+                console.log('confirmSave payload:', payload);
+                /*
+                fetch('/api/player/update', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(payload)
+                })
+                .then(r => r.json())
+                .then(data => {
+                    setPlayerProfile(data);  // refresh the card
+                    cancelEdit();
+                    dismissConfirm();
+                })
+                .catch(err => alert('Save failed: ' + err.message));
+                */
+
+                // ── Stub: update display immediately for demo ──
+                document.getElementById('id-val-name').textContent = payload.name;
+                document.getElementById('profile-btn-avatar').textContent =
+                    payload.name.substring(0, 2).toUpperCase();
+
+                cancelEdit();
+                dismissConfirm();
+            }
+
+
+            /* ════════════════════════════════════════
+               CHANGE PICTURE
+            ════════════════════════════════════════ */
+
+            /**
+             * handleChangePicture — triggered by "Change Picture" button.
+             *
+             * ── JAVA BACKEND HOOK ──────────────────────────────────────────
+             * Open a file-picker, upload the chosen image to your server,
+             * then call setAvatarImage(url) with the returned image URL.
+             *
+             * Suggested flow:
+             *   1. <input type="file" accept="image/*"> (created programmatically)
+             *   2. On change, POST FormData to /api/player/upload-avatar
+             *   3. Server stores image, returns { avatarUrl: "..." }
+             *   4. Call setAvatarImage(data.avatarUrl)
+             * ──────────────────────────────────────────────────────────────
+             */
+            function handleChangePicture() {
+                // TODO: Java — wire up file upload
+                console.log('handleChangePicture triggered');
+                // Example stub — opens native file picker:
+                // const input = document.createElement('input');
+                // input.type = 'file'; input.accept = 'image/*';
+                // input.onchange = e => uploadAvatar(e.target.files[0]);
+                // input.click();
+            }
+
+            /**
+             * setAvatarImage — call from Java-side JS after upload success.
+             * @param {string} url — public URL of uploaded avatar image
+             */
+            function setAvatarImage(url) {
+                const circle = document.getElementById('id-avatar-circle');
+                circle.innerHTML = `<img src="${url}" alt="avatar">`;
+            }
+
+
+            /* ════════════════════════════════════════
+               JAVA UTILITY HOOKS
+            ════════════════════════════════════════ */
+
+            /**
+             * setPlayerProfile — call on page load (or after login/save) with player data.
+             *
+             * @param {{
+             *   name:     string,
+             *   initials: string,
+             *   email:    string,
+             *   rank:     string,
+             *   level:    number,
+             *   xp:       number,
+             *   xpMax:    number,
+             *   stages:   number,
+             *   winRate:  number,
+             *   coins:    number,
+             *   avatarUrl?: string
+             * }} data
+             */
+            function setPlayerProfile(data) {
+                // Top-bar avatar initials
+                document.getElementById('profile-btn-avatar').textContent = data.initials;
+
+                // Mini profile popup
+                document.getElementById('mini-avatar').textContent = data.initials;
+                document.getElementById('mini-name').textContent = data.name;
+                document.getElementById('mini-rank').textContent = data.rank;
+                document.getElementById('mini-stat-level').textContent = data.level;
+                document.getElementById('mini-stat-xp').textContent = data.xp + ' / ' + data.xpMax;
+                document.getElementById('mini-stat-stages').textContent = data.stages;
+                document.getElementById('mini-stat-winrate').textContent = data.winRate + '%';
+                document.getElementById('mini-stat-coins').textContent = data.coins.toLocaleString();
+
+                // ID card fields
+                document.getElementById('id-val-name').textContent = data.name;
+                document.getElementById('id-val-email').textContent = data.email;
+
+                // Currency chip
+                document.getElementById('currency-display').textContent = '🪙 ' + data.coins.toLocaleString();
+
+                if (data.avatarUrl) setAvatarImage(data.avatarUrl);
+            }
+
+            /**
+             * setIslands — populate the islands grid from Java data.
+             * @param {{ id, name, status:'unlocked'|'locked', cleared, total }[]} islandsArray
+             */
+            function setIslands(islandsArray) {
+                const grid = document.getElementById('islands-grid');
+                grid.innerHTML = '';
+                islandsArray.forEach(island => {
+                    if (island.status === 'unlocked') {
+                        grid.innerHTML += `
+                    <button class="island-card" data-island-id="${island.id}" data-status="unlocked"
+                            onclick="openIslandModal(${island.id}, '${island.name}')">
+                        <div class="island-icon-box">
+                            <img src="assets/temporary/temp.png" alt="${island.name}"
+                                 onerror="this.outerHTML='<span style=\\'font-size:2rem\\'>🗺</span>'">
+                        </div>
+                        <div class="island-info-box">
+                            <div class="island-name">${island.name}</div>
+                            <div class="island-progress-pill">— ${island.cleared}/${island.total} ★ —</div>
+                        </div>
+                    </button>`;
+                    } else {
+                        grid.innerHTML += `
+                    <div class="island-card locked" data-island-id="${island.id}" data-status="locked">
+                        <div class="island-icon-box"><span class="lock-icon">🔒</span></div>
+                        <div class="island-info-box"><div class="island-name">Locked</div></div>
+                    </div>`;
+                    }
+                });
+            }
+
+            /**
+             * setShopItems — populate shop from Java data.
+             * @param {{ id, name, price, emoji }[]} items
+             */
+            function setShopItems(items) {
+                const grid = document.getElementById('shop-grid');
+                grid.innerHTML = '';
+                items.forEach(item => {
+                    grid.innerHTML += `
+                <div class="shop-card" data-item-id="${item.id}">
+                    <div class="shop-img">${item.emoji}</div>
+                    <div class="shop-info">
+                        <div class="shop-name">${item.name}</div>
+                        <div class="shop-price">🪙 ${item.price}</div>
+                        <button class="shop-buy-btn" onclick="buyItem('${item.id}')">Buy</button>
+                    </div>
+                </div>`;
+                });
+            }
+
+            /* ════════════════════════════════════════
+               ISLAND LEVEL MODAL
+            ════════════════════════════════════════ */
+
+            /**
+             * openIslandModal — opens the level grid for a given island.
+             *
+             * ── JAVA BACKEND HOOK ─────────────────────────────────────────
+             * Fetch level data then call:
+             *   openIslandModal(islandId, islandName, levelsArray)
+             * levelsArray = [{ id, status:'completed'|'unlocked'|'locked', stars:0-3 }]
+             *
+             * e.g.:
+             *   fetch('/api/island/' + islandId + '/levels')
+             *     .then(r => r.json())
+             *     .then(data => openIslandModal(data.id, data.name, data.levels));
+             * ──────────────────────────────────────────────────────────────
+             */
+            function openIslandModal(islandId, islandName, levelsArray) {
+                if (!levelsArray) {
+                    levelsArray = [
+                        { id: 1, status: 'completed', stars: 3 },
+                        { id: 2, status: 'completed', stars: 2 },
+                        { id: 3, status: 'completed', stars: 1 },
+                        { id: 4, status: 'unlocked', stars: 0 },
+                        { id: 5, status: 'locked', stars: 0 },
+                        { id: 6, status: 'locked', stars: 0 },
+                        { id: 7, status: 'locked', stars: 0 },
+                        { id: 8, status: 'locked', stars: 0 },
+                        { id: 9, status: 'locked', stars: 0 },
+                        { id: 10, status: 'locked', stars: 0 },
+                    ];
+                }
+                document.getElementById('island-modal-title').textContent = '⚔ ' + islandName + ' — Stages';
+                const grid = document.getElementById('levels-grid-modal');
+                grid.innerHTML = '';
+                levelsArray.forEach(lv => {
+                    const btn = document.createElement('button');
+                    btn.className = 'level-cell-fantasy lv-' + lv.status;
+                    btn.dataset.levelId = lv.id;
+                    btn.dataset.islandId = islandId;
+                    if (lv.status === 'locked') {
+                        btn.innerHTML = '<span style="font-size:1.4rem">🔒</span>';
+                        btn.disabled = true;
+                    } else {
+                        btn.innerHTML = `<span class="lv-num">${lv.id}</span><span class="lv-stars">${'★'.repeat(lv.stars)}${'☆'.repeat(3 - lv.stars)}</span>`;
+                        btn.onclick = () => startLevel(lv.id, islandId);
+                    }
+                    grid.appendChild(btn);
+                });
+                document.getElementById('island-modal-overlay').classList.add('open');
+            }
+
+            function closeIslandModal() {
+                document.getElementById('island-modal-overlay').classList.remove('open');
+            }
+            function closeIslandModalOutside(e) {
+                if (e.target === document.getElementById('island-modal-overlay')) closeIslandModal();
+            }
+
+let pendingLevel = null;
+let pendingIsland = null;
+
+function startLevel(levelId, islandId) {
+
+    pendingLevel = levelId;
+    pendingIsland = islandId;
+
+    loadCommission(levelId, islandId);
+
+    document
+        .getElementById("commission-overlay")
+        .classList.add("open");
+}
+
+            /** Java hook: load practice session */
+            function startPractice(m) { console.log('startPractice:', m); }
+
+            /** Java hook: purchase API */
+            function buyItem(id) { console.log('buyItem:', id); }
+
+            function toggleProfile() {
+                const overlay = document.getElementById("profile-overlay");
+
+                overlay.classList.toggle("open");
+            }
+
+            function closeProfileOutside(event) {
+                if (event.target.id === "profile-overlay") {
+                    toggleProfile();
+                }
+            }
+
+function loadCommission(levelId, islandId) {
+
+    const commissions = {
+
+        1: {
+            title: "Defeat the Goblin Bug",
+
+            story:
+            "A mischievous Goblin Bug is blocking the path. " +
+            "Use the Print Spell to reveal hidden words.",
+
+            lesson:
+            "The print() function displays output.",
+
+            code:
+`print("Hello Adventurer!")`
+        },
+
+        2: {
+            title: "Echo Spell Training",
+
+            story:
+            "The Slime Wizard repeats words. " +
+            "Learn how to store magic in variables.",
+
+            lesson:
+            "Variables store data.",
+
+            code:
+`name = "Hero"
+print(name)`
+        },
+
+        3: {
+            title: "Number Magic",
+
+            story:
+            "A Stone Golem counts endlessly. " +
+            "Learn number operations.",
+
+            lesson:
+            "You can add numbers in Python.",
+
+            code:
+`a = 5
+b = 3
+print(a + b)`
+        }
+
+    };
+
+    const data = commissions[levelId];
+
+    if (!data) return;
+
+    document.getElementById("commission-title")
+        .textContent = data.title;
+
+    document.getElementById("commission-story")
+        .textContent = data.story;
+
+    document.getElementById("commission-lesson-text")
+        .textContent = data.lesson;
+
+    document.getElementById("commission-code")
+        .textContent = data.code;
+}
+
+
+
+function closeCommission() {
+
+    document
+        .getElementById("commission-overlay")
+        .classList.remove("open");
+}
+
+function acceptCommission() {
+
+    closeCommission();
+
+    window.location.href =
+        `Battle.html?island=${pendingIsland}&stage=${pendingLevel}`;
+}
+
+
+
+        </script>
+        <script type="module" src="main.js"></script>
+        <script type="module" src="scripts/index-app.js"></script>
+
+</body>
+
+</html>
